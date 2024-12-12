@@ -7,9 +7,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import React from "react";
-import Collapsible from "./components/Collapsible";
 import GroupChat from "./components/GroupChat";
 import { UserStatus } from "./components/UserStatus";
+import Collapsible from "./components/layout/Collapsible";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter(); // To navigate after logout
