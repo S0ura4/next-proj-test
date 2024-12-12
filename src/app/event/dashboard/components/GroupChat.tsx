@@ -2,7 +2,7 @@
 // GroupChat component can also be made responsive for better visibility.
 
 import React, { useEffect, useRef } from "react";
-import { useChat } from "../hooks/useChat";
+import { useChat } from "../hooks/usePublicChat";
 
 const GroupChat = () => {
   const { messages, newMessage, setNewMessage, sendMessage, formatTimestamp } =

@@ -12,16 +12,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getCookie } from "cookies-next";
 
 export function UserStatus() {
   const { users, error } = useUserStatus();
-
+  const userId = getCookie("userId") as string;
   if (error) {
     return <div className="text-destructive text-sm">Error: {error}</div>;
   }
 
   const handleSendChallenge = (user: User) => {
-    console.log(`Sending challenge to ${user.id}`);
+    console.log(`sender ${userId} ,reciever ${user.id}`);
     // Implement your challenge sending logic here
   };
 
