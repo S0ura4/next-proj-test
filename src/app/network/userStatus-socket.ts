@@ -9,7 +9,8 @@ import {
 import { getCookie } from "cookies-next";
 import { User } from "../event/dashboard/types";
 
-const SOCKET_URL = "http://localhost:8080/user-status";
+//const SOCKET_URL = "http://localhost:8080/user-status";
+const SOCKET_URL = "http://localhost:8080/message-public-chat";
 
 export const useSocketStatus = (setUsers: Dispatch<SetStateAction<User[]>>) => {
   const [socket, setSocket] = useState<Socket | null>(null);
