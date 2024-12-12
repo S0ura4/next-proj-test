@@ -33,7 +33,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               onClick={() => setIsGameplayOpen(true)}
               className="text-white p-2 bg-gray-600 rounded-md w-full"
             >
-              Open Gameplay
+              Maximize
             </button>
           </div>
 

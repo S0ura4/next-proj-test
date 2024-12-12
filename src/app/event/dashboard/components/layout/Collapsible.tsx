@@ -17,7 +17,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen, setIsOpen }) => {
             onClick={() => setIsOpen(true)}
             className="text-white p-2 bg-gray-600 rounded-md w-full"
           >
-            Open Gameplay
+            Maximize
           </button>
         </div>
       ) : (
@@ -26,7 +26,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen, setIsOpen }) => {
             onClick={() => setIsOpen(false)}
             className="text-white p-2 bg-gray-600 rounded-md mb-4 self-center w-1/4"
           >
-            Close Gameplay
+            Minimize
           </button>
           <div className="flex flex-row flex-1 space-x-4 p-4">
             {/* Private Chat */}
