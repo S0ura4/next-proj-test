@@ -2,7 +2,6 @@ import axios from "axios";
 import { getCookie } from "cookies-next";
 import { useEffect, useState } from "react";
 import { User } from "../types";
-import { useSocketStatus } from "@/app/network/userStatus-socket";
 
 const useUserStatus = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -10,8 +9,6 @@ const useUserStatus = () => {
 
   const token = getCookie("authToken") as string;
   const userId = getCookie("userId") as string;
-
-  const { socket, socketConnected } = useSocketStatus(setUsers);
 
   useEffect(() => {
     const fetchUserStatus = async () => {
@@ -39,11 +36,7 @@ const useUserStatus = () => {
     fetchUserStatus();
   }, [token, userId]);
 
-  if (socket && socketConnected) {
-    socket.emit("sendMessage", { text: "socket connected!" });
-  }
-
-  return { users, error, setUsers };
+  return { users, setUsers, error };
 };
 
 export default useUserStatus;

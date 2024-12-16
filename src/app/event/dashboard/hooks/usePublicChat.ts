@@ -1,34 +1,49 @@
-// useChat.ts
-import { fetchMessages } from "@/app/network/api";
-import { sendMessageToSocket, useSocket } from "@/app/network/socket";
 import { useState, useEffect, useCallback } from "react";
 import { Message, User } from "../types";
 import { getCookie } from "cookies-next";
+import { usePublicChatSocket } from "@/app/network/socket-refactor/publicChat/usePublicChatListeners";
+import httpClient from "@/app/network/network";
+import {
+  joinPublicChat,
+  sendMessagePublicChat,
+  startPublicChat,
+} from "@/app/network/socket-refactor/publicChat/usePublicChatEmitters";
 
-export const useChat = () => {
+export const usePublicChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [chatRoomId, setChatRoomId] = useState<number | null>(null);
 
-  // Use socket hook
-  const { socket, socketConnected } = useSocket(setChatRoomId, setMessages);
+  // Connect to the public chat namespace
+  const socketConnected = usePublicChatSocket(setChatRoomId, setMessages);
 
-  // Fetch messages from API using the updated api module
+  // Fetch messages from the API inline
   const fetchMessagesFromAPI = useCallback(async () => {
     try {
-      const fetchedMessages = await fetchMessages(); // Now using httpClient
+      const response = await httpClient.get("/chat/messages/public-messages");
+      const fetchedMessages: Message[] = response.data.data;
       setMessages(fetchedMessages);
     } catch (error) {
-      console.error("Error fetching messages:", error);
+      console.error("Error fetching public messages:", error);
     }
   }, []);
 
-  // Fetch messages on component mount
+  // Fetch initial messages once
   useEffect(() => {
     fetchMessagesFromAPI();
   }, [fetchMessagesFromAPI]);
 
-  // Send message handler
+  // Once connected, start or join a public chat room
+  useEffect(() => {
+    if (socketConnected) {
+      // Start a public chat room
+      startPublicChat();
+
+      // If needed, you can join an existing public chat:
+      joinPublicChat();
+    }
+  }, [socketConnected]);
+
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -37,39 +52,31 @@ export const useChat = () => {
       return;
     }
 
-    const messageData = {
-      content: newMessage,
-      chatRoomId: chatRoomId,
-    };
-
-    // Add the message to the state immediately for local display
-
     const userName = getCookie("userName") as string;
     const userEmail = getCookie("userEmail") as string;
 
+    // Optimistically update the message list
     setMessages((prevMessages) => [
       ...prevMessages,
       {
         id: Date.now(),
         content: newMessage,
         sender: {
-          name: userName, // Display "You" as the sender's name
-          email: userEmail, // Add the current user's email if needed
-          isOnline: true, // Set online status if relevant
-        } as User, // Ensure this matches your `User` type
+          name: userName,
+          email: userEmail,
+          isOnline: true,
+        } as User,
         timestamp: new Date().toISOString(),
       },
     ]);
 
-    // Send message via socket
-    if (socketConnected) {
-      sendMessageToSocket(socket, messageData);
-    }
-
-    setNewMessage(""); // Clear input
+    // Send the message through the emitter
+    sendMessagePublicChat({ content: newMessage, chatRoomId });
+    console.log("message sent from client side log");
+    // Clear the input
+    setNewMessage("");
   };
 
-  // Format timestamp
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleString();
@@ -81,7 +88,6 @@ export const useChat = () => {
     setNewMessage,
     sendMessage,
     formatTimestamp,
-    socket,
     chatRoomId,
   };
 };
