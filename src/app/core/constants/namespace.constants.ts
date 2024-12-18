@@ -5,3 +5,7 @@ export const PublicChatSpace = {
 export const StatusSpace = {
   userStatus: "/user-status",
 };
+
+export const PrivateChatSpace = {
+  messagePrivateChat: "/message-private-chat",
+};

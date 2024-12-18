@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { User } from "../types";
 import { UserCircle, Send } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,15 +14,26 @@ import {
 import { getCookie } from "cookies-next";
 import useUserStatusSocket from "@/app/network/socket-refactor/userStatus/useStatusSocket";
 import useUserStatus from "../hooks/useUserStatus";
+//import { sendAlertRequest } from "@/app/network/socket-refactor/privateChat/usePrivateChatEmitters";
 
 export function UserStatus() {
   const { users, setUsers, error } = useUserStatus();
   const { socketConnected } = useUserStatusSocket(setUsers);
   const userId = getCookie("userId") as string;
 
+  const [challengeSent, setChallengeSent] = useState<{
+    [key: number]: boolean;
+  }>({});
+
   const handleSendChallenge = (user: User) => {
+    if (challengeSent[user.id]) {
+      alert("Challenge already sent to this user.");
+      return;
+    }
     console.log(`sender ${userId}, receiver ${user.id}`);
-    // Implement your challenge sending logic here
+    //sendAlertRequest({ playerTwoId: user.id, accepted: false });
+    setChallengeSent((prev) => ({ ...prev, [user.id]: true }));
+    alert(`Challenge sent to ${user.name}`);
   };
 
   return (
@@ -38,6 +49,7 @@ export function UserStatus() {
                       <Button
                         variant="ghost"
                         className="w-full justify-start px-2 py-1 h-auto"
+                        disabled={!socketConnected}
                       >
                         <div className="flex items-center w-full">
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
@@ -56,9 +68,16 @@ export function UserStatus() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleSendChallenge(user)}>
+                      <DropdownMenuItem
+                        onClick={() => handleSendChallenge(user)}
+                        disabled={challengeSent[user.id]}
+                      >
                         <Send className="mr-2 h-4 w-4" />
-                        <span>Send Challenge</span>
+                        <span>
+                          {challengeSent[user.id]
+                            ? "Challenge Sent"
+                            : "Send Challenge"}
+                        </span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -88,9 +107,7 @@ export function UserStatus() {
             </p>
           )
         ) : error ? (
-          <p className="text-sm text-red-500 p-2">
-            {error}
-          </p>
+          <p className="text-sm text-red-500 p-2">{error}</p>
         ) : (
           <p className="text-sm text-muted-foreground p-2">
             Connecting to the user status server...

@@ -16,6 +16,14 @@ export const publicChatSocket = (namespace: string): Socket =>
     },
   });
 
+export const privateChatSocket = (namespace: string): Socket =>
+  io(baseUrl + namespace, {
+    transports: ["websocket"],
+    auth: {
+      token: `Bearer ${cookieToken}`,
+    },
+  });
+
 export const userStatusSocket = (namespace: string): Socket =>
   io(baseUrl + namespace, {
     transports: ["websocket"],

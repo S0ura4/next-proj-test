@@ -8,10 +8,19 @@ import React, { useState } from "react";
 import GroupChat from "./components/GroupChat";
 import { UserStatus } from "./components/UserStatus";
 import Collapsible from "./components/layout/Collapsible";
+import useUserStatusSocket from "@/app/network/socket-refactor/userStatus/useStatusSocket";
+import ChallengePopup from "./components/private/ChallangePopup";
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const [isGameplayOpen, setIsGameplayOpen] = useState(false);
+
+  const [challengeData, setChallengeData] = useState<any | null>(null);
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
 
   const handleLogout = () => {
     deleteCookie("authToken");
@@ -20,6 +29,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     deleteCookie("userEmail");
     router.push("/auth/login");
   };
+
+  // Callback whenever a requestResponse event is received
+  const onRequestResponse = (data: unknown) => {
+    // data structure expected: { from: string, message: { playerOneId, playerTwoId, accepted } }
+    setChallengeData(data);
+    setShowChallengeModal(true);
+  };
+
+  // Initialize user status socket with callback
+  useUserStatusSocket(() => {}, onRequestResponse);
 
   return (
     <div className="h-screen bg-gray-800">
@@ -59,8 +78,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
       )}
+
+      {showChallengeModal && challengeData && (
+        <ChallengePopup
+          from={challengeData.from}
+          payload={challengeData.message}
+          onClose={() => setShowChallengeModal(false)}
+        />
+      )}
     </div>
   );
-};
-
-export default DashboardLayout;
+}

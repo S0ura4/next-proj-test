@@ -18,3 +18,14 @@ export const publicChatEvents = {
   joinPublicChat: "joinPublicChat",
   sendPublicMessage: "sendPublicMessage",
 };
+
+export const privateChatEvents = {
+  startPrivateChat: "startPrivateChat",
+  privateChatStarted: "privateChatStarted",
+  joinPrivateChat: "joinPrivateChat",
+  userJoined: "userJoined",
+  sendMessage: "sendMessage",
+  receiveMessage: "receiveMessage",
+  alertRequest: "alert_Request",
+  requestResponse: "requestResponse",
+};

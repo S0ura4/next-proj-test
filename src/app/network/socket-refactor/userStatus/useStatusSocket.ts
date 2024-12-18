@@ -1,17 +1,18 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
-import { userStatusSocket } from "../socket";
 import { StatusSpace } from "@/app/core/constants/namespace.constants";
 import {
   socketEvents,
   userStatusEvents,
 } from "@/app/core/constants/socket.events";
 import { User } from "@/app/event/dashboard/types";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
+import { userStatusSocket } from "../socket";
 
 export let statusSocketConnection: Socket;
 
 export default function useUserStatusSocket(
   setUsers: Dispatch<SetStateAction<User[]>>
+  //onRequestResponse?: (data: unknown) => void
 ) {
   const [socketConnected, setSocketConnected] = useState(false);
 
@@ -54,6 +55,14 @@ export default function useUserStatusSocket(
         );
       }
     );
+
+    //statusSocketConnection.on(
+    //  privateChatEvents.requestResponse,
+    //  (data: unknown) => {
+    //    console.log("Received request response:", data);
+    //    if (onRequestResponse) onRequestResponse(data);
+    //  }
+    //);
 
     return () => {
       console.log("Cleaning up socket connection...");

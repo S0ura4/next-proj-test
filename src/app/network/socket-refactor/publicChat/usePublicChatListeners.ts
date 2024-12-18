@@ -1,12 +1,12 @@
 import { PublicChatSpace } from "@/app/core/constants/namespace.constants";
+import {
+  publicChatEvents,
+  socketEvents
+} from "@/app/core/constants/socket.events";
+import { Message, User } from "@/app/event/dashboard/types";
 import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import { publicChatSocket } from "../socket";
-import {
-  publicChatEvents,
-  socketEvents,
-} from "@/app/core/constants/socket.events";
-import { Message, User } from "@/app/event/dashboard/types";
 
 export let publicChatSocketConnection: Socket;
 
@@ -31,12 +31,9 @@ export const usePublicChatSocket = (
       console.error("Public Chat Socket connection error:", error);
     });
 
-    publicChatSocketConnection.on(
-      socketEvents.reconnectAttempt,
-      (attempt) => {
-        console.log(`Reconnecting... Attempt #${attempt}`);
-      }
-    );
+    publicChatSocketConnection.on(socketEvents.reconnectAttempt, (attempt) => {
+      console.log(`Reconnecting... Attempt #${attempt}`);
+    });
 
     publicChatSocketConnection.on("disconnect", () => {
       console.log("Socket disconnected");
@@ -61,10 +58,11 @@ export const usePublicChatSocket = (
         console.log("Received message:", message);
 
         const sender: User = {
+          id: 1,
           name: message.from,
-          email: "", 
-          isOnline: false, 
-          avatar: "", 
+          email: "",
+          isOnline: false,
+          avatar: "",
         };
 
         setMessages((prevMessages) => [
